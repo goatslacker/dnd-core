@@ -7,15 +7,18 @@ export default class DragDropManager {
     const flux = new Flux(this);
 
     this.flux = flux;
-    this.registry = new HandlerRegistry(flux.registryActions);
+    this.registry = new HandlerRegistry(
+      flux.registryActions,
+      flux.micro.RegistryActions
+    );
     this.monitor = new DragDropMonitor(flux, this.registry);
     this.backend = createBackend(this);
 
-    flux.refCountStore.addListener('change', this.handleRefCountChange, this);
+    flux.micro.RefCountStore.subscribe(this.handleRefCountChange.bind(this));
   }
 
   handleRefCountChange() {
-    const shouldSetUp = this.flux.refCountStore.hasRefs();
+    const shouldSetUp = this.flux.micro.RefCountStore.hasRefs();
     if (shouldSetUp && !this.isSetUp) {
       this.backend.setup();
       this.isSetUp = true;

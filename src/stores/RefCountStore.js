@@ -1,34 +1,26 @@
-import { Store } from 'flummox';
+export const state = { refCount: 0 }
 
-export default class RefCountStore extends Store {
-  constructor(flux) {
-    super();
-
-    const { registryActionIds } = flux;
-
-    this.register(registryActionIds.addSource, this.addRef);
-    this.register(registryActionIds.addTarget, this.addRef);
-    this.register(registryActionIds.removeSource, this.removeRef);
-    this.register(registryActionIds.removeTarget, this.removeRef);
-
-    this.state = {
-      refCount: 0
-    };
+export const observe = (context) => {
+  return {
+    addRef: [context.RegistryActions.addSource, context.RegistryActions.addTarget],
+    removeRef: [context.RegistryActions.removeSource, context.RegistryActions.removeTarget]
   }
+}
 
-  addRef() {
-    this.setState({
-      refCount: this.state.refCount + 1
-    });
+export const reduce = (context, prevState, signals) => {
+  if (signals.addRef) {
+    return { refCount: prevState.refCount + 1 }
+  } else if (signals.removeRef) {
+    return { refCount: prevState.refCount - 1 }
+  } else {
+    return prevState
   }
+}
 
-  removeRef() {
-    this.setState({
-      refCount: this.state.refCount - 1
-    });
-  }
-
-  hasRefs() {
-    return this.state.refCount > 0;
+export const statics = (context) => {
+  return {
+    hasRefs() {
+      return context.RefCountStore.get().refCount > 0;
+    }
   }
 }

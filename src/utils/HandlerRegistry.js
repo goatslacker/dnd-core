@@ -58,8 +58,9 @@ function parseRoleFromHandlerId(handlerId) {
 }
 
 export default class HandlerRegistry {
-  constructor(actions) {
+  constructor(actions, microActions) {
     this.actions = actions;
+    this.microActions = microActions;
 
     this.types = {};
     this.handlers = {};
@@ -74,6 +75,7 @@ export default class HandlerRegistry {
 
     const sourceId = this.addHandler(HandlerRoles.SOURCE, type, source);
     this.actions.addSource(sourceId);
+    this.microActions.addSource(sourceId);
     return sourceId;
   }
 
@@ -83,6 +85,7 @@ export default class HandlerRegistry {
 
     const targetId = this.addHandler(HandlerRoles.TARGET, type, target);
     this.actions.addTarget(targetId);
+    this.microActions.addTarget(targetId);
     return targetId;
   }
 
@@ -139,6 +142,7 @@ export default class HandlerRegistry {
     delete this.types[sourceId];
 
     this.actions.removeSource(sourceId);
+    this.microActions.removeSource(sourceId);
   }
 
   removeTarget(targetId) {
@@ -148,6 +152,7 @@ export default class HandlerRegistry {
     delete this.types[targetId];
 
     this.actions.removeTarget(targetId);
+    this.microActions.removeTarget(targetId);
   }
 
   pinSource(sourceId) {
